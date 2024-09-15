@@ -3,10 +3,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 // Import screens
-import HomeScreen from "../screens/Home/HomeScreen";
+import LoggedOutScreen from "../screens/Home/LoggedOutScreen";
 import LoginScreen from "../screens/Auth/LoginScreen";
 import RegisterScreen from "../screens/Auth/RegisterScreen";
-
+import VerifyScreen from "../screens/Auth/VerifyScreen";
+import CreateAccountScreen from "../screens/CreateAccount/CreateAccountScreen";
 // Main Stack Navigator
 const Stack = createNativeStackNavigator();
 
@@ -15,8 +16,8 @@ function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
+          name="LoggedOut"
+          component={LoggedOutScreen}
           options={{ headerShown: false }} // This removes the header from HomeScreen
         />
         <Stack.Screen
@@ -29,6 +30,17 @@ function AppNavigator() {
           component={RegisterScreen}
           options={{ headerShown: false }} // Removes header from RegisterScreen
         />
+        <Stack.Screen
+          name="Verify"
+          component={VerifyScreen}
+          options={{ headerShown: false }} // Removes header from VerifyScreen
+        />
+        <Stack.Screen
+          name="CreateAccount"
+          component={CreateAccountScreen}
+          options={{ headerShown: false }} // Removes header from CreateAccountScreen
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

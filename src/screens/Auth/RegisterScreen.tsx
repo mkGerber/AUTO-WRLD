@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Auth } from 'aws-amplify';
 import {
   View,
   Text,
@@ -11,29 +12,35 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Amplify } from 'aws-amplify';
+import awsExports from '../../aws-exports';
+
+// Configure Amplify with the awsExports settings
+Amplify.configure(awsExports);
 
 const RegisterScreen = () => {
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState(""); // Email input
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  const formatPhoneNumber = (input) => {
-    // Remove non-digit characters
-    const cleaned = ("" + input).replace(/\D/g, "");
+  // Handle the user registration
+  const onSubmit = async (event) => {
+    event.preventDefault();
 
-    // Limit the length to 10 digits
-    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
-
-    // Format the phone number as (123) 456-7890
-    if (match) {
-      return [match[1], match[2], match[3]].filter(Boolean).join("-");
+    try {
+      const { user } = await Auth.signUp({
+        username,
+        password,
+        attributes: {
+          email, // Use email for registration
+        },
+      });
+      console.log('Sign up successful!', user);
+      navigation.navigate("Verify", { username });
+    } catch (error) {
+      console.error('Error signing up:', error);
     }
-
-    return input;
-  };
-
-  const handlePhoneNumberChange = (text) => {
-    const formatted = formatPhoneNumber(text);
-    setPhoneNumber(formatted);
   };
 
   return (
@@ -49,31 +56,33 @@ const RegisterScreen = () => {
           />
         </View>
         <View style={styles.formContainer}>
-          <Text style={styles.inputTitle}>phone number</Text>
+          <Text style={styles.inputTitle}>Email</Text>
           <TextInput
-            placeholder="123-456-7890"
-            placeholderTextColor="#D3D3D3" // Light grey color
+            placeholder="example@example.com"
+            placeholderTextColor="#D3D3D3"
             style={styles.input}
-            keyboardType="phone-pad" // Numeric keyboard for phone numbers
-            maxLength={12} // Allow hyphens and 10 digits
-            value={phoneNumber}
-            onChangeText={handlePhoneNumberChange}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
-          <Text style={styles.inputTitle}>username</Text>
+          <Text style={styles.inputTitle}>Username</Text>
           <TextInput
             placeholder=". . ."
-            placeholderTextColor="#D3D3D3" // Light grey color
+            placeholderTextColor="#D3D3D3"
             style={styles.input}
+            onChangeText={(text) => setUsername(text)}
           />
-          <Text style={styles.inputTitle}>password</Text>
+          <Text style={styles.inputTitle}>Password</Text>
           <TextInput
             placeholder=". . ."
-            placeholderTextColor="#D3D3D3" // Light grey color
+            placeholderTextColor="#D3D3D3"
             style={styles.input}
             secureTextEntry={true}
+            onChangeText={(text) => setPassword(text)}
           />
         </View>
-        <TouchableOpacity style={styles.buttonGold}>
+        <TouchableOpacity style={styles.buttonGold} onPress={onSubmit}>
           <Text style={styles.buttonText}>REGISTER</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -124,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 20, // Add margin for spacing
   },
   buttonGold: {
-    backgroundColor: "#FFE500", // Change this to your preferred color
+    backgroundColor: "#FFE500",
     padding: 10,
     borderRadius: 90,
     width: "80%",

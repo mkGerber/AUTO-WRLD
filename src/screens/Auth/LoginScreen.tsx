@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { Auth } from 'aws-amplify';
 import {
   View,
   Text,
@@ -11,9 +12,27 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Amplify } from 'aws-amplify';
+import awsExports from '../../aws-exports';
+
+// Configure Amplify with the awsExports settings
+Amplify.configure(awsExports);
 
 const LoginScreen = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigation = useNavigation();
+
+  // Handle user login
+  const onLogin = async () => {
+    try {
+      await Auth.signIn(username, password);
+      console.log('Login successful!');
+      navigation.navigate("CreateAccount", { username });
+    } catch (error) {
+      console.error('Error logging in:', error);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -28,21 +47,25 @@ const LoginScreen = () => {
           />
         </View>
         <View style={styles.formContainer}>
-          <Text style={styles.inputTitle}>username</Text>
+          <Text style={styles.inputTitle}>Username</Text>
           <TextInput
             placeholder=". . ."
             placeholderTextColor="#D3D3D3" // Light grey color
             style={styles.input}
+            value={username}
+            onChangeText={(text) => setUsername(text)}
           />
-          <Text style={styles.inputTitle}>password</Text>
+          <Text style={styles.inputTitle}>Password</Text>
           <TextInput
             placeholder=". . ."
             placeholderTextColor="#D3D3D3" // Light grey color
             style={styles.input}
             secureTextEntry={true}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
           />
         </View>
-        <TouchableOpacity style={styles.buttonGold}>
+        <TouchableOpacity style={styles.buttonGold} onPress={onLogin}>
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
       </ScrollView>
