@@ -24,7 +24,7 @@ const Experience = ({ onSelectExperience }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>How Car Are You?</Text>
+      <Text style={styles.title}>What's your ride?</Text>
 
       {['Diehard', 'Advanced', 'Intermediate', 'Beginner'].map(option => (
         <View key={option} style={styles.optionContainer}>
@@ -100,4 +100,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Experience;
+export default YourRide;

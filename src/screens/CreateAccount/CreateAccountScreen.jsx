@@ -1,18 +1,89 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import Experience from './Components/Experience';
+import Enjoyments from './Components/Enjoyments'; // Import your next component
+import YourRide from './Components/YourRide'; // Import your next component
 
-import  Experience  from './Components/Experience';
+const CreateAccount = () => {
+  const [currentStep, setCurrentStep] = useState('experience'); // Track which component is showing
+  const [experience, setExperience] = useState([]); // Store selected experience
+  const [enjoyments, setEnjoyments] = useState([]); // Store selected enjoyments
+  const translateXAnim = useRef(new Animated.Value(0)).current;
 
-const ExperienceScreen = () => {
+  const animateToNext = () => {
+    Animated.timing(translateXAnim, {
+      toValue: -500, // Swipe left
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => {
+      if (currentStep === 'experience') {
+        setCurrentStep('enjoyments'); // Move to next component
+      } else if (currentStep === 'enjoyments') {
+        // Implement logic for more screens if needed
+        setCurrentStep('yourRide'); // Move to next component
+      }
+      translateXAnim.setValue(500); // Reset position
+      Animated.timing(translateXAnim, {
+        toValue: 0, // Bring the new screen into view
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+
+  const animateToPrevious = () => {
+    Animated.timing(translateXAnim, {
+      toValue: 500, // Swipe right
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => {
+      setCurrentStep('experience'); // Move to previous component
+      translateXAnim.setValue(-500); // Prepare the previous screen for animation
+      Animated.timing(translateXAnim, {
+        toValue: 0, // Bring the previous screen into view
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
 
   return (
-    <Experience/>
+    <View style={styles.container}>
+      <Animated.View
+        style={[
+          styles.animatedContainer,
+          {
+            transform: [{ translateX: translateXAnim }],
+          },
+        ]}
+      >
+        {currentStep === 'experience' && (
+          <Experience
+            onSelectExperience={(selectedOption) => setExperience(selectedOption)}
+          />
+        )}
+        {currentStep === 'enjoyments' && (
+          <Enjoyments
+            onSelectEnjoyment={(selectedOption) => setEnjoyments(selectedOption)}
+          />
+        )}
+        {currentStep === 'yourRide' && <YourRide />}
+        
+      </Animated.View>
+
+      {/* Next Button */}
+      <TouchableOpacity
+        style={styles.nextButton}
+        onPress={() => {
+          console.log('Experience:', experience);
+          console.log('Enjoyments:', enjoyments);
+          animateToNext();
+        }}
+      >
+        <Text style={styles.nextButtonText}>Next</Text>
+      </TouchableOpacity>
+      
+    </View>
   );
 };
 
@@ -21,61 +92,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    paddingTop: 50,
+    paddingBottom: 15,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 80,
-    textAlign: 'center',
-    marginTop: 50,
-  },
-  optionContainer: {
-    marginBottom: 30, // Creates consistent space between options
-    alignItems: 'center',
+  animatedContainer: {
+    flex: 1,
     width: '100%',
-  },
-  optionButton: {
-    backgroundColor: '#000',
-    borderRadius: 50,
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    alignItems: 'center',
-    width: '80%',
-  },
-  selectedOption: {
-    backgroundColor: '#FFE500', // Yellow when selected
-  },
-  optionText: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  subText: {
-    color: '#000',
-    fontSize: 16,
-    marginTop: 5,
-  },
-  linkButton: {
-    marginTop: 10,
-  },
-  linkText: {
-    color: '#0000FF',
-    textDecorationLine: 'underline',
   },
   nextButton: {
     backgroundColor: '#FFE500',
     borderRadius: 50,
     paddingVertical: 10,
     paddingHorizontal: 30,
-    marginTop: 30,
     alignItems: 'center',
+    marginTop: 20,
   },
   nextButtonText: {
     color: '#000',
     fontSize: 24,
     fontWeight: 'bold',
   },
+  backButton: {
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  backButtonText: {
+    color: '#000',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  activeBackButton: {
+    backgroundColor: '#FFE500', // Yellow when active
+  },
+  disabledBackButton: {
+    backgroundColor: '#e0e0e0', // Light grey when disabled
+  },
 });
 
-export default ExperienceScreen;
+export default CreateAccount;
